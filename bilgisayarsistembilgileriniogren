@@ -1,0 +1,28 @@
+import platform
+import psutil
+import wmi
+
+# Sistem adı
+print("Sistem Adı: ", platform.node())
+
+# İşletim sistemi
+print("İşletim Sistemi: ", platform.system())
+
+# İşlemci
+print("İşlemci: ", platform.processor())
+
+# Bellek
+memory = psutil.virtual_memory()
+print("Bellek: ", round(memory.total / (1024.0 ** 3), 2), "GB")
+
+# Windows işletim sistemi için seri numarası
+c = wmi.WMI()
+for item in c.Win32_ComputerSystemProduct():
+    print("Seri Numarası: ", item.IdentifyingNumber)
+
+# Ekran kartı
+c = wmi.WMI()
+for item in c.Win32_VideoController():
+    print("Ekran Kartı: ", item.Name)
+    print("Sürüm: ", item.DriverVersion)
+    print("Bellek Boyutu: ", round(int(item.AdapterRAM)/(1024.0 ** 2),2),"MB")
