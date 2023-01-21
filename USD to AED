@@ -1,0 +1,52 @@
+import wx
+import requests
+
+class Convertor(wx.Frame):
+    def __init__(self, parent, title):
+        super().__init__(parent, title=title, size=(300,200))
+        self.InitUI()
+        self.Centre()
+        self.Show()
+
+    def InitUI(self):
+        panel = wx.Panel(self)
+
+        vbox = wx.BoxSizer(wx.VERTICAL)
+
+        hbox1 = wx.BoxSizer(wx.HORIZONTAL)
+        amount_label = wx.StaticText(panel, label='USD Miktarı:')
+        self.amount_entry = wx.TextCtrl(panel)
+        hbox1.Add(amount_label, flag=wx.RIGHT, border=8)
+        hbox1.Add(self.amount_entry, proportion=1)
+
+        hbox2 = wx.BoxSizer(wx.HORIZONTAL)
+        convert_btn = wx.Button(panel, label='Dönüştür')
+        hbox2.Add(convert_btn)
+        vbox.Add(hbox2, flag=wx.ALIGN_RIGHT|wx.TOP, border=10)
+
+        vbox.Add(hbox1, flag=wx.EXPAND|wx.LEFT|wx.RIGHT|wx.TOP, border=10)
+
+        self.result = wx.StaticText(panel, label='Sonuç:')
+        vbox.Add(self.result, flag=wx.ALIGN_RIGHT|wx.TOP, border=10)
+
+        panel.SetSizer(vbox)
+
+        convert_btn.Bind(wx.EVT_BUTTON, self.convert)
+
+    def convert(self, event):
+        amount = self.amount_entry.GetValue()
+        amount = amount.replace(",", ".")
+        amount = float(amount)
+
+        url = "https://api.exchangerate-api.com/v4/latest/USD"
+        response = requests.get(url)
+        data = response.json()
+
+        AED_rate = data["rates"]["AED"]
+        AED_amount = amount * AED_rate
+        self.result.SetLabel("Sonuç: {} AED".format(AED_amount))
+
+if __name__ == '__main__':
+    app = wx.App()
+    Convertor(None, title='USD to AED Converter')
+    app.MainLoop()
